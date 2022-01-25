@@ -1,0 +1,13 @@
+---
+- name: Ensure Certificates
+  copy:
+    content: "{{ item.data | default(omit) }}"
+    src: "{{ item.src | default(omit) }}"
+    dest: "{{ item.dest }}"
+    owner: "{{ item.owner | default('root') }}"
+    group: "{{ item.group | default('root') }}"
+    mode: "{{ item.mode | default('0640' if item.dest is contains('private') else '0644') }}"
+    validate: "/usr/bin/openssl {{ 'rsa -check' if item.dest is contains('private') else 'x509' }} -in %s -noout"
+  loop: "{{ certificates }}"
+  loop_control:
+    label: "{{ item.dest }}"
